@@ -45,7 +45,7 @@ class samehadaku(object):
         response = self.requests.get(postlink)
         # response = open(self.libutils.real_path('/samehadaku-post-view.html')).read()
         response = BeautifulSoup(response.text, 'html.parser')
-        colors = ['[G1]','[G2]','[G2]']
+        colors = ['[G1]','[G2]']
         for li in response.select('.download-eps>ul>li'):
             try:
                 text = f'{li.strong.text.strip():>6}'
