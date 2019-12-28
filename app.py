@@ -3,38 +3,41 @@ import shutil
 import threading
 import subprocess
 
+
 def main():
-    ''' log '''
     log = src.log()
     log.type = 1
-    log.value_prefix = "datetime.datetime.now().strftime('[%H:%M:%S]{clear}')"
 
-    browser = 'chromium-browser'
-    for x in ['chromium-browser','firefox','termux-open-url']:
+    browser = ''
+    for x in ['chromium-browser', 'firefox', 'termux-open-url']:
         if shutil.which(x):
             browser = x
             break
 
-    ''' samehadaku '''
-    samehadaku = src.samehadaku()
-    samehadaku.liblog = log
-    samehadaku.post_list()
-
     try:
+        samehadaku = src.samehadaku()
+        samehadaku.liblog = log
+        samehadaku.get_post_list()
         while True:
-            ''' command '''
-            result = str(input(':: '))
-            if not result:
-                samehadaku.post_list()
-            elif result.startswith('v'):
-                samehadaku.post_view(result.split('v')[1])
-            elif result.startswith('o'):
-                process = subprocess.Popen(f"{browser} {samehadaku.download_link.get(result.split('o')[1])}".split(' '), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                threading.Thread(target=process.communicate).start()
+            for data in str(input(':: ')).split(' '):
+                if not data:
+                    samehadaku.get_post_list()
+                elif data.startswith('v'):
+                    samehadaku.view_post(data.split('v')[1])
+                elif data.startswith('o'):
+                    download_link = samehadaku.download_link.get(data.split('o')[1])
+                    if browser:
+                        process = subprocess.Popen(
+                            f"{browser} {download_link}".split(' '), stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+                        )
+                        threading.Thread(target=process.communicate).start()
+                    else:
+                        log.log(download_link)
+                elif data == 'exit':
+                    break
     except KeyboardInterrupt:
         log.keyboard_interrupt()
-    finally:
-        pass
+
 
 if __name__ == '__main__':
     main()

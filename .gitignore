@@ -1,11 +1,8 @@
 # User
 *.stackdump
 
+src/*/
 src/*.html
-# src/*/
-storage/*/*
-
-!.gitkeep
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
