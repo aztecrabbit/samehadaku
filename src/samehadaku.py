@@ -17,7 +17,7 @@ class samehadaku(object):
         self.post_link_id = 1
         self.download_link = {}
         self.page = 1
-        self.page_paginate = 1
+        self.page_paginate = 2
 
     def log(self, value, color='[G1]', type=1):
         self.liblog.log(value, color=color, type=type)
@@ -102,7 +102,7 @@ class samehadaku(object):
 
         results = url.split('?r=')
         url = base64.b64decode(results[1]).decode()
-        self.log(url, color='[Y1]')
+        self.log(url, color='[G1]')
 
         if self.browser:
             process = subprocess.Popen(
