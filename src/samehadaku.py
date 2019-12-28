@@ -1,4 +1,8 @@
+import re
+import base64
 import requests
+import threading
+import subprocess
 from .utils.utils import utils
 from bs4 import BeautifulSoup
 
@@ -13,7 +17,7 @@ class samehadaku(object):
         self.post_link_id = 1
         self.download_link = {}
         self.page = 1
-        self.page_paginate = 2
+        self.page_paginate = 1
 
     def log(self, value, color='[G1]', type=1):
         self.liblog.log(value, color=color, type=type)
@@ -48,7 +52,7 @@ class samehadaku(object):
                 self.post_link_id = self.post_link_id + 1
             self.page = self.page + 1
 
-    def view_post(self, post_link_id: str, colors: list = ['[G1]', '[G2]'], i: int = 0):
+    def view_post(self, post_link_id: str, colors: list = ['[G1]', '[G2]'], i: int = 1):
         if not self.post_link.get(post_link_id, False):
             self.log(f"Post {post_link_id} not found!", color='[R1]')
             return
@@ -70,3 +74,38 @@ class samehadaku(object):
                 i = i + 1
 
             self.log(" | ".join(item_format_link_values), color=self.rotate_list(colors))
+
+    def open_download_link(self, download_link_id):
+        if not self.download_link.get(download_link_id, False):
+            self.log(f"Download link ({download_link_id}) not found!", color='[R1]')
+            return
+
+        self.log('Crawling Download link')
+
+        download_link = self.download_link[download_link_id]
+        print(download_link)
+        response = self.request('POST', 'https://www.anjay.info/coastal-oil-spill-modeling/', data={
+            'eastsafelink_id': download_link.split('id=')[1],
+        })
+
+        results = re.findall(r"changeLink\(\)\{var a\='(.+)?';window\.open\(a,\"_blank\"\)};", response.text)
+        url = results[0]
+        print(url)
+
+        response = self.request('GET', url)
+        results = re.findall(r"{}".format(
+            "<div class=\"download-link\" style=\"text-align:center;font-size:14px;\">"
+            "<a href=\"(.+)?\" rel=\"nofollow\" target=\"_blank\">"
+        ), response.text)
+        url = results[0]
+        print(url)
+
+        results = url.split('?r=')
+        url = base64.b64decode(results[1]).decode()
+        self.log(url, color='[Y1]')
+
+        if self.browser:
+            process = subprocess.Popen(
+                f"{self.browser} {url}".split(' '), stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+            )
+            threading.Thread(target=process.communicate).start()

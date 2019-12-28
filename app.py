@@ -1,7 +1,5 @@
 import src
 import shutil
-import threading
-import subprocess
 
 
 def main():
@@ -17,6 +15,7 @@ def main():
     try:
         samehadaku = src.samehadaku()
         samehadaku.liblog = log
+        samehadaku.browser = browser
         samehadaku.get_post_list()
         while True:
             for data in str(input(':: ')).split(' '):
@@ -25,14 +24,7 @@ def main():
                 elif data.startswith('v'):
                     samehadaku.view_post(data.split('v')[1])
                 elif data.startswith('o'):
-                    download_link = samehadaku.download_link.get(data.split('o')[1])
-                    if browser:
-                        process = subprocess.Popen(
-                            f"{browser} {download_link}".split(' '), stdout=subprocess.PIPE, stderr=subprocess.STDOUT
-                        )
-                        threading.Thread(target=process.communicate).start()
-                    else:
-                        log.log(download_link)
+                    samehadaku.open_download_link(data.split('o')[1])
                 elif data == 'exit':
                     break
     except KeyboardInterrupt:
