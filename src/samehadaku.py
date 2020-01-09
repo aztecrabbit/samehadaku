@@ -61,9 +61,15 @@ class samehadaku(object):
         # response = open(self.libutils.real_path('/samehadaku-post-view.html')).read()
         response = BeautifulSoup(response.text, 'html.parser')
         for item_format in response.select('.download-eps>ul>li'):
-            item_format_text = item_format.strong.text.strip()
-            item_format_link_values = [f"{item_format_text:>6}"]
-            for item_format_link in item_format.select('span>a'):
+            try:
+                item_format_text = item_format.strong.text.strip()
+            except AttributeError:
+                item_format_text = 'unknown'
+            item_format_link_values = [f"{item_format_text:>8}"]
+            item_format_link_list = item_format.select('a[target="_blank"]')
+            if not item_format_link_list:
+                item_format_link_list = item_format.select('span>a')
+            for item_format_link in item_format_link_list:
                 if not item_format_link.get('href', False):
                     self.log(item_format_link, color='[R1]')
                 download_link_id = f"{post_link_id}:{i}"

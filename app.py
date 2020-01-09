@@ -25,8 +25,6 @@ def main():
                     samehadaku.view_post(data.split('v')[1])
                 elif data.startswith('o'):
                     samehadaku.open_download_link(data.split('o')[1])
-                elif data == 'exit':
-                    break
     except KeyboardInterrupt:
         log.keyboard_interrupt()
 
