@@ -34,6 +34,32 @@ class samehadaku(object):
             except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
                 self.liblog.sleep(7, value_resumming=None, color='[R1]')
 
+    def get_post(self, url: str):
+        if not url.startswith('http'):
+            self.log(f"Invalid Url ({url})", color='[R1]')
+            return
+        self.log(f"Requesting {url}")
+        response = self.request('GET', url)
+        # response = open(self.libutils.real_path('/samehadaku-post.html')).read()
+        response = BeautifulSoup(response.text, 'html.parser')
+        for item_post in reversed(response.select('div.episodelist>ul>li>span.lefttitle')):
+            item_post_link = item_post.a.get('href')
+            item_post_title, _, item_post_episode = [x.strip() for x in item_post.a.text.rpartition(' Episode ')]
+
+            try:
+                item_post_episode = int(item_post_episode)
+            except ValueError:
+                item_post_title = f"{item_post_title} - {item_post_episode}"
+                item_post_episode = '...'
+
+            self.post_link[str(self.post_link_id)] = item_post_link
+            self.log(
+                f"[Y1]Episode{item_post_episode:.>10}[CC] "
+                f"[P1]{self.post_link_id:>3}[CC] "
+                f"[G1]{item_post_title.strip()}[CC]"
+            )
+            self.post_link_id = self.post_link_id + 1
+
     def get_post_list(self):
         for i in range(self.page_paginate):
             self.log(f"Requesting Page {self.page}")
@@ -43,7 +69,15 @@ class samehadaku(object):
             response = BeautifulSoup(response.text, 'html.parser')
             for item_post in response.select('div.updateanime>ul>li>.dtl'):
                 self.post_link[str(self.post_link_id)] = item_post.h2.a.get('href')
-                item_post_title, _, item_post_episode = item_post.h2.a.get('title').rpartition(' Episode ')
+                item_post_title, _, item_post_episode = [
+                    x.strip() for x in item_post.h2.a.get('title').rpartition(' Episode ')]
+
+                try:
+                    item_post_episode = int(item_post_episode)
+                except ValueError:
+                    item_post_title = f"{item_post_title} - {item_post_episode}"
+                    item_post_episode = '...'
+
                 self.log(
                     f"[Y1]Episode{item_post_episode:.>10}[CC] "
                     f"[P1]{self.post_link_id:>3}[CC] "
