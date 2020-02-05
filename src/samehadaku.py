@@ -63,7 +63,7 @@ class samehadaku(object):
     def get_post_list(self):
         for i in range(self.page_paginate):
             self.log(f"Requesting Page {self.page}")
-            url = 'https://samehadaku.tv' + ('' if self.page == 1 else f"/page/{self.page}")
+            url = 'https://samehada.tv' + ('' if self.page == 1 else f"/page/{self.page}")
             response = self.request('GET', url)
             # response = open(self.libutils.real_path('/samehadaku.html')).read()
             response = BeautifulSoup(response.text, 'html.parser')
