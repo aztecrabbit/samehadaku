@@ -17,7 +17,7 @@ class samehadaku(object):
         self.post_link_id = 1
         self.download_link = {}
         self.page = 1
-        self.page_paginate = 2
+        self.page_paginate = 1
 
     def log(self, value, color='[G1]', type=1):
         self.liblog.log(value, color=color, type=type)
@@ -63,7 +63,7 @@ class samehadaku(object):
     def get_post_list(self):
         for i in range(self.page_paginate):
             self.log(f"Requesting Page {self.page}")
-            url = 'https://samehada.tv' + ('' if self.page == 1 else f"/page/{self.page}")
+            url = 'https://www.samehada.tv' + ('' if self.page == 1 else f"/page/{self.page}")
             response = self.request('GET', url)
             # response = open(self.libutils.real_path('/samehadaku.html')).read()
             response = BeautifulSoup(response.text, 'html.parser')
